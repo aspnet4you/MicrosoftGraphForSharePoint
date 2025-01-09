@@ -1,0 +1,512 @@
+{
+	"info": {
+		"_postman_id": "bf67bd2b-b490-47b2-b39d-2661723a336f",
+		"name": "MicrosoftGraphAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40705815"
+	},
+	"item": [
+		{
+			"name": "GetTokenROPCPaul",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"access_token\", JSON.parse(responseBody).access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "{{ClientID}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{ClientSecret}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{UserID-PaulSmith}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{UserPassword-PaulSmith}}",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "https://graph.microsoft.com/.default",
+							"type": "text"
+						},
+						{
+							"key": "state",
+							"value": "12345",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://login.microsoftonline.com/{{TenantID}}/oauth2/v2.0/token",
+					"protocol": "https",
+					"host": [
+						"login",
+						"microsoftonline",
+						"com"
+					],
+					"path": [
+						"{{TenantID}}",
+						"oauth2",
+						"v2.0",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get SiteId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json();\r",
+							"var site_id = responseBody.id.split(\",\")[1];\r",
+							"\r",
+							"pm.environment.set(\"site_id\", site_id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/sites/aspnet4you2.sharepoint.com:/sites/PaulsTeam",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"sites",
+						"aspnet4you2.sharepoint.com:",
+						"sites",
+						"PaulsTeam"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Drives",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseBody = pm.response.json();\r",
+							"const drive_id = responseBody.value[0].id;\r",
+							"\r",
+							"pm.environment.set(\"drive_id\", drive_id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/sites/{{site_id}}/drives",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"sites",
+						"{{site_id}}",
+						"drives"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Root Folder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseBody = pm.response.json();\r",
+							"const parent_id = responseBody.value[0].parentReference.id;\r",
+							"\r",
+							"pm.environment.set(\"parent_id\", parent_id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{drive_id}}/root/children",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{drive_id}}",
+						"root",
+						"children"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AddNewOrUpdateFile",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "Hello this is updated file!!"
+				},
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{drive_id}}/items/{{parent_id}}:/paulsfile.txt:/content",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{drive_id}}",
+						"items",
+						"{{parent_id}}:",
+						"paulsfile.txt:",
+						"content"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetFileReference",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseBody = pm.response.json();\r",
+							"const file_id = responseBody.id;\r",
+							"\r",
+							"pm.environment.set(\"file_id\", file_id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{drive_id}}/items/{{parent_id}}:/paulsfile.txt",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{drive_id}}",
+						"items",
+						"{{parent_id}}:",
+						"paulsfile.txt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetFile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseBody = pm.response.json();\r",
+							"const file_id = responseBody.id;\r",
+							"\r",
+							"pm.environment.set(\"file_id\", file_id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/drives/{{drive_id}}/items/{{file_id}}?select=id,@microsoft.graph.downloadUrl",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"drives",
+						"{{drive_id}}",
+						"items",
+						"{{file_id}}"
+					],
+					"query": [
+						{
+							"key": "select",
+							"value": "id,@microsoft.graph.downloadUrl"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetRecentFiles",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/me/drive/recent",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"me",
+						"drive",
+						"recent"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPaulsDrive",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/users/{{UserID-PaulSmith}}/drive",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"users",
+						"{{UserID-PaulSmith}}",
+						"drive"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetBobsDriveWithPaulsToken",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://graph.microsoft.com/v1.0/users/{{UserID-BobSmith}}/drive",
+					"protocol": "https",
+					"host": [
+						"graph",
+						"microsoft",
+						"com"
+					],
+					"path": [
+						"v1.0",
+						"users",
+						"{{UserID-BobSmith}}",
+						"drive"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
